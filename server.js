@@ -90,7 +90,7 @@ app.post('/signin', async (req, res) => { signin.handleSignin(req, res, con, bcr
 app.post('/register', async (req, res) => { register.handleRegister(req, res, con, bcrypt, getUser) })
 
 
-
-app.listen(process.env.PORT || 4000, () => {
-    console.log(`app is running on port ${process.env.PORT}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT || 3000, () => {
+    console.log(`app is running on port ${PORT}`);
 })
