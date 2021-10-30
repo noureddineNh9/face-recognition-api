@@ -91,6 +91,6 @@ app.post('/register', async (req, res) => { register.handleRegister(req, res, co
 
 
 
-app.listen(4000, () => {
-    console.log('app is running on port 4000');
+app.listen(process.env.PORT || 4000, () => {
+    console.log(`app is running on port ${process.env.PORT}`);
 })
