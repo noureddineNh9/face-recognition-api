@@ -1,21 +1,14 @@
-const handleProfile = (req, res, con) => {
-    const {id} = req.params;
-    let isFound = false
-
-    const sql = `SELECT * FROM users where id=${id}`;
-    con.query(sql, (err, result) => {
-        if (err) {
-            res.status(400).json("something wrong")
+const handleProfile = (req, res, db) => {
+    const { id } = req.params;
+    db.select('*').from('users').where({id})
+      .then(user => {
+        if (user.length) {
+          res.json(user[0])
+        } else {
+          res.status(400).json('Not found')
         }
-        const data = JSON.parse(JSON.stringify(result));
-        var result = null;
-        if(data.length != 0){
-            return res.json(data[0]);
-        }else{
-            res.status(400).json('user not found')
-        }
-    });
-
+      })
+      .catch(err => res.status(400).json('error getting user'))
 }
 
 module.exports = {

@@ -1,49 +1,24 @@
-const handleSignin = async (req, res, con, bcrypt, getUser) => {
-    const {email, password} = req.body;
-
-    let currentUser ;
-    var error = '';
-
-    
-    if (!email || !password ) {
-        return res.status(400).json("incorrect form submission")
+const handleSignin = async (req, res, db, bcrypt) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json('incorrect form submission');
     }
-
-    const sql = `SELECT email, hash FROM login where email='${email}'`
-    con.query(sql, (err, result) => {
-        if(err){
-            throw err;
-        }
-        const data = JSON.parse(JSON.stringify(result));
-        console.log(result);
-        
-        if(data.length != 0)
-        {
-            const hash = data[0].hash
-            bcrypt.compare(password, hash, async (err, isValid) => {
-                if(err){
-                    throw err
-                }
-    
-                if(isValid){
-                    await getUser(email)
-                    .then((result) => {
-                        if (result != null) {
-                            currentUser = result
-                        }
-                    })
-                    return res.json(currentUser);
-                }else{
-                    res.status(400).json("Invalid passsword")
-                }
+    db.select('email', 'hash').from('login')
+      .where('email', '=', email)
+      .then(data => {
+        const isValid = bcrypt.compareSync(password, data[0].hash);
+        if (isValid) {
+          return db.select('*').from('users')
+            .where('email', '=', email)
+            .then(user => {
+              res.json(user[0])
             })
-        }else{
-            res.status(400).json("User not found")
+            .catch(err => res.status(400).json('unable to get user'))
+        } else {
+          res.status(400).json('wrong credentials')
         }
-    })
-    if(error != '')
-        res.status(400).json(error)
-
+      })
+      .catch(err => res.status(400).json('wrong credentials'))
 } 
 
 module.exports = {

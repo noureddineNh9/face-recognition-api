@@ -1,47 +1,34 @@
-const handleRegister = async (req, res, con, bcrypt, getUser) => {
+const handleRegister = async (req, res, db, bcrypt) => {
     const {email, name, password} = req.body;
-    let exist = false;
-    let currentUser ;
 
     if (!email || !password || !name) {
         return res.status(400).json("incorrect form submission")
     }
 
-    await getUser(email)
-        .then((result) => {
-            if (result != null) {
-                exist = true
-            }
-        })
-        .catch(console.log())
-
-    if (!exist) {
-        bcrypt.hash(password, null, null, (err, hash) => {
-            const sql = `INSERT INTO login(email, hash) values('${email}','${hash}')`;
-            con.query(sql, (err, result) => {
-                if (err) {
-                    res.status(400).json("something wrong")
-                }
-                const sql2 = `INSERT INTO users(name, email, joined) values('${name}','${email}','${new Date().toISOString().split('.')[0]}')`
-                con.query(sql2, async (err, result) => {
-                    if (err) {
-                        res.status(400).json("something wrong")
-                    }
-                    // return user Info
-                    await getUser(email)
-                    .then((result) => {
-                        if (result != null) {
-                            currentUser = result
-                        }
-                    })
-                    return res.json(currentUser);
-                })
-            })
-        })
-    }else{
-        res.status(400).json('User exist')
-
-    }
+    const hash = bcrypt.hashSync(password);
+    db.transaction(trx => {
+      trx.insert({
+        hash: hash,
+        email: email
+      })
+      .into('login')
+      .returning('email')
+      .then(loginEmail => {
+        return trx('users')
+          .returning('*')
+          .insert({
+            email: loginEmail[0],
+            name: name,
+            joined: new Date()
+          })
+          .then(user => {
+            res.json(user[0]);
+          })
+      })
+      .then(trx.commit)
+      .catch(trx.rollback)
+    })
+    .catch(err => res.status(400).json('unable to register'))
 }
 
 module.exports = {

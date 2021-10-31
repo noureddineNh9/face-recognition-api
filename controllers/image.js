@@ -10,27 +10,15 @@ const handleImageurl = (req, res) => {
         .then(data => res.json(data))
 }
 
-const handleImage = (req, res, con) => {
-    const { id } = req.body
-
-    const sql = `UPDATE users SET entries=entries+1 where id=${id}`
-    con.query(sql, (err, result) => {
-        if (err) {
-            res.status(400).json("something wrong")
-        }
-
-        con.query(`select entries from users where id=${id}`, (err, result) => {
-            if (err) {
-                res.status(400).json("something wrong")
-            }
-            const data = JSON.parse(JSON.stringify(result));
-            res.send(data[0])
-
-        })
-
-
+const handleImage = (req, res, db) => {
+    const { id } = req.body;
+    db('users').where('id', '=', id)
+    .increment('entries', 1)
+    .returning('entries')
+    .then(entries => {
+      res.json(entries[0]);
     })
-
+    .catch(err => res.status(400).json('unable to get entries'))
 }
 
 module.exports = {
