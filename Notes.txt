@@ -1,0 +1,11 @@
+get start with heroku : 
+
+sudo snap install heroku --classic
+
+heroku create 
+
+git push heroku main
+
+heroku open 
+
+if some error : heroku logs --tail

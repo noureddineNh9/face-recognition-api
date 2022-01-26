@@ -15,17 +15,6 @@ app.use(cors());
 
 /*
 const db = knex({
-    // connect to your own database here:
-    client: 'pg',
-    connection: {
-      connectionString: process.env.DATABASE_URL,
-      ssl: true
-    }
-});
-*/
-
-// database
-const db = knex({
    // connect to your own database here:
    client: "pg",
    connection: {
@@ -34,6 +23,18 @@ const db = knex({
       database: "smartbraindb",
       password: "Eddine21",
       port: 5432,
+   },
+});
+
+*/
+
+// database
+const db = knex({
+   // connect to your own database here:
+   client: "pg",
+   connection: {
+      connectionString: process.env.DATABASE_URL,
+      ssl: true,
    },
 });
 
