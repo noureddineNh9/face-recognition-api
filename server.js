@@ -45,7 +45,7 @@ db.select("*")
    });
 
 app.get("/", (request, response) => {
-   response.send("Ok Ok");
+   response.send("it's working.");
 });
 
 app.get("/profile/:id", (req, res) => {
