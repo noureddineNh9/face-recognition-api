@@ -13,21 +13,13 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-/*
 const db = knex({
    // connect to your own database here:
    client: "pg",
-   connection: {
-      user: "postgres",
-      host: "localhost",
-      database: "smartbraindb",
-      password: "Eddine21",
-      port: 5432,
-   },
+   connection: process.env.POSTGRES_URI,
 });
 
-*/
-
+/*
 // database
 const db = knex({
    // connect to your own database here:
@@ -45,6 +37,7 @@ db.select("*")
    .then((data) => {
       console.log(data);
    });
+*/
 
 app.get("/", (request, response) => {
    response.send("it's working.");
@@ -70,6 +63,9 @@ app.post("/register", async (req, res) => {
    register.handleRegister(req, res, db, bcrypt);
 });
 
-app.listen(process.env.PORT || 3000, () => {
-   console.log(`app is running on port ${process.env.PORT}`);
+// app.listen(process.env.PORT || 3000, () => {
+//    console.log(`app is running on port ${process.env.PORT}`);
+// });
+app.listen(3000, () => {
+   console.log(`app is running on port 3000`);
 });
