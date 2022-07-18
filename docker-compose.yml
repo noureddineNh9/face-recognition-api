@@ -9,12 +9,14 @@ services:
       working_dir: /usr/src/face-recognition-api
       environment:
          POSTGRES_URI: postgres://sally:secret@postgres:5432/face-recognition-db
-      links:
-         - postgres
+         REDIS_URI: redis://redis:6379
+
       ports:
          - "3000:3000"
       volumes:
          - ./:/usr/src/face-recognition-api
+      networks:
+         - redis
 
    #Postgres
    postgres:
@@ -27,4 +29,17 @@ services:
       build: ./postgres
       ports:
          - "5432:5432"
-# psql postgres://sally:secret@localhost:5432/face-recognition-db
+      networks:
+         - redis
+   # psql postgres://sally:secret@localhost:5432/face-recognition-db
+
+   # redis
+   redis:
+      image: redis
+      networks:
+         - redis
+      ports:
+         - "6379:6379"
+networks:
+   redis:
+      driver: bridge

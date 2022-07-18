@@ -13,6 +13,26 @@ const handleProfile = (req, res, db) => {
       .catch((err) => res.status(400).json("error getting user"));
 };
 
+const update = (req, res, db) => {
+   const { id } = req.params;
+   const { name, age } = req.body;
+
+   db("users")
+      .where({ id })
+      .update({ name })
+      .then((resp) => {
+         if (resp) {
+            res.status(200).json("success");
+         } else {
+            res.status(400).json("error");
+         }
+      })
+      .catch((err) => {
+         res.status(400).json("error");
+      });
+};
+
 module.exports = {
-   handleProfile: handleProfile,
+   handleProfile,
+   update,
 };

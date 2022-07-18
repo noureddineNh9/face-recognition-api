@@ -8,6 +8,7 @@ const register = require("./controllers/register");
 const signin = require("./controllers/signin");
 const image = require("./controllers/image");
 const profile = require("./controllers/profile");
+const auth = require("./middlewares/authorization");
 
 const app = express();
 app.use(bodyParser.json());
@@ -43,21 +44,23 @@ app.get("/", (request, response) => {
    response.send("it's working.");
 });
 
-app.get("/profile/:id", (req, res) => {
+app.get("/profile/:id", auth.requireAuth, (req, res) => {
    profile.handleProfile(req, res, db);
 });
 
-app.put("/image", (req, res) => {
+app.post("/profile/:id", auth.requireAuth, (req, res) => {
+   profile.update(req, res, db);
+});
+
+app.put("/image", auth.requireAuth, (req, res) => {
    image.handleImage(req, res, db);
 });
 
-app.post("/imageurl", (req, res) => {
+app.post("/imageurl", auth.requireAuth, (req, res) => {
    image.handleImageurl(req, res);
 });
 
-app.post("/signin", async (req, res) => {
-   signin.handleSignin(req, res, db, bcrypt);
-});
+app.post("/signin", signin.signinAuthentication(db, bcrypt));
 
 app.post("/register", async (req, res) => {
    register.handleRegister(req, res, db, bcrypt);
